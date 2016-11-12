@@ -19,7 +19,7 @@ Download and include the single javascript file in your Cordova app:
 <script src="lib/localStoragePlus.js"></script>
 ```
 
-Use the same command call syntax as localStorage:
+This defines a new object called localStoragePlus.  Use it with the same command call syntax as localStorage:
 
 ```javascript
 localStoragePlus.setItem('user', 'bob');
