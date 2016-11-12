@@ -12,4 +12,17 @@ localStorage does, but it uses WebSQL in the background to securly store your da
 There are various other methods to store stuff, but all are more complex for simple key/value storage.  This has fixed the issue for
 my app, and I'll leave it here for anyone else.  Enjoy!
 
+#Usage#
+
+Use the same commannds as localStorage:
+
+```javascript
+localStoragePlus.setItem('user', 'bob');
+
+var user = localStoragePlus.getItem('user');   // user == 'bob'
+
+localStoragePlus.removeItem('user');
+```
+
+
 
