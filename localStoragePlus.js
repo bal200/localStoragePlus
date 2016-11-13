@@ -1,3 +1,9 @@
+/*****
+ ***** localStoragePlus is a Replacement for the browsers localStorage functions,
+ ***** specifically for use with Cordova, because your apps localStorage can be
+ ***** wiped when a phone's storage is low.
+ ***** v1.0.0
+ *****/
 
 var LocalStoragePlus = function() {
   var name = "localStoragePlus"; /* websql database name */
@@ -114,7 +120,7 @@ LocalStoragePlus.prototype.dbTrans = function() {
       tx.executeSql(sqlStatement, [],
       function (tx, result) {
         /*** SUCCESS **/
-        console.log("LocalStoragePlus: Successfully saved "+self.pending[0].key+" to DB");
+        console.log("LocalStoragePlus: Successfully saved an item to DB");
         self.pending.splice(0, 1); /* remove from pending queue array */
         self.executing=0;
 
@@ -132,16 +138,19 @@ LocalStoragePlus.prototype.dbTrans = function() {
   }
 }
 
-LocalStoragePlus.prototype.migrateLocalStorage = function() {
+LocalStoragePlus.prototype.migrateLocalStorage = function( todo ) {
   var ls = window.localStorage;
   console.log("LocalStoragePlus: migrating localStorage to localStoragePlus");
+  if (typeof(todo)=='string')  todo = [todo];
 
   for(var i=0; i<ls.length; i++) {
     var key = ls.key(i);
     var value = ls[key];
     //console.log(key + " => " + value);
-    if (this.getItem(key) == null) { /* dont overwrite it if it exists already */
-      this.setItem(key, value);
+    if (!todo || (todo.indexOf(key) != -1)) { /* check it's an item we're migrating  */
+      if (this.getItem(key) == null) { /* dont overwrite it if it exists already */
+        this.setItem(key, value);
+      }
     }
   }
 }

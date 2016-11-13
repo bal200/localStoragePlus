@@ -1,6 +1,6 @@
 # localStoragePlus
 Replacement for the browsers localStorage functions, specifically for use with Cordova,
-where localStorage can be wiped when a phone's storage is low.
+where your apps localStorage can be wiped when a phone's storage is low.
 
 localStorage is a quick and easy way to store some simple strings in a Cordova app that you need
 to persist if the app is closed.  Examples are app settings, cached data, users ids, etc.  But
@@ -13,7 +13,7 @@ securly store your data.
 There are various other methods to store stuff, but all are more complex for simple key/value
 storage.  This has fixed the issue for my app, and I'll leave it here for anyone else.  Enjoy!
 
-#Usage#
+##Usage##
 
 Download and include the single javascript file in your Cordova app:
 ```
@@ -40,7 +40,7 @@ for n=0; n < localStoragePlus.length; n++) {
 ```
 Key/value pairs stored with localSoragePlus are now safe on an iPhone with low storage.
 
-#Migration from localStorage#
+##Migration from localStorage##
 
 For existing apps, you can move all your data over from localStorage to localStoragePlus with
 the migrateLocalStorage command.  This will copy each key/value pair over. It can be run at the
@@ -56,11 +56,12 @@ if (localStoragePlus.getItem('migrationDone') == null) {
 ```
 You then can search and replace localStorage for localStoragePlus throughout your app.
 
-#Not implemented#
+##Not implemented##
 
 There are some additional methods of accessing the original localStorage that are not
 implemented in localStoragePlus.
 
  - You cannot access items with the dot operator,  Eg. `localStoragePlus.user = 'bob';` will not work.
-   You will need to use setItem or getItem instead.
- -
+ - You cannot access items with the Array method,  Eg. `localStoragePlus[n] = 'bob'` wont work.
+
+You will need to use setItem or getItem instead.
