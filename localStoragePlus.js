@@ -1,22 +1,18 @@
 
-// var storage = window.localStorage;
-// var value = storage.getItem(key); // Pass a key name to get its value.
-// storage.setItem(key, value) // Pass a key name and its value to add or update that key.
-// storage.removeItem(key) // Pass a key name to remove that key from storage.
-
 var LocalStoragePlus = function() {
   var name = "localStoragePlus"; /* websql database name */
   var estSize = 128 *1024;  /* bytes.  User is asked to extend if it exceeds this */
   var ver = "1.0";  /* database version */
-  
+
+  this.length=0;
   this.pending = [];
   /* pending[x]: sqlStatement string */
-  
+
   this.cache = [];
   /* cache[x]: {key, value} */
 
   this.executing = 0; /* 1 means currently executing sql at top of pending queue */
-  
+
   this.db = window.openDatabase(name, ver, name, estSize);
   if (this.db){
     this.executing=1;
@@ -24,7 +20,7 @@ var LocalStoragePlus = function() {
     this.db.transaction(function(tx) {
         tx.executeSql("CREATE TABLE IF NOT EXISTS localStoragePlus (key text primary key, value text)", [],
         function (tx, results) {
-          console.log("LocalStoragePlus: Successfully created Database");
+          console.log("LocalStoragePlus: Successfully opened Database");
           self.executing=0;
           self.loadCache();
         }, function(err){
@@ -46,6 +42,7 @@ LocalStoragePlus.prototype.loadCache = function() {
         //console.log(i+" loaded key:"+results.rows.item(i).key+" val:"+results.rows.item(i).value);
       }
       self.executing=0;
+      this.length=results.rows.length;
       console.log("LocalStoragePlus: Loaded "+results.rows.length+" keys from DB.");
     }, function (err) {
       console.log("localStoragePlus: "+err.message);
@@ -64,6 +61,7 @@ LocalStoragePlus.prototype.setItem = function(key, value) {
   }
   if (index==-1){ /* didnt exist, so its a INSERT  */
     this.cache.push({key: key, value: value});
+    this.length++;
     sqlStatement = 'INSERT INTO localStoragePlus (key, value) '
                  + 'VALUES ("'+key+'", "'+value+'")';
   }else{ /* the key already exists, so UPDATE  */
@@ -74,7 +72,6 @@ LocalStoragePlus.prototype.setItem = function(key, value) {
   console.log("LocalStoragePlus: saved "+key);
 
   this.dbTrans();
-
 }
 
 LocalStoragePlus.prototype.getItem = function(key) {
@@ -92,9 +89,10 @@ LocalStoragePlus.prototype.removeItem = function(key) {
   for (n=0; n<this.cache.length; n++) {
     if (key == this.cache[n].key) {
       this.cache.splice(n, 1);
+      this.length--;
       sqlStatement = 'DELETE FROM localStoragePlus '
                    + 'WHERE key="'+key+'";';
-      
+
       this.pending.push(sqlStatement);
       console.log("LocalStoragePlus: removed "+key);
       this.dbTrans();
@@ -110,7 +108,7 @@ LocalStoragePlus.prototype.clear = function() {
 LocalStoragePlus.prototype.dbTrans = function() {
   if (this.pending.length >0 && this.executing==0) {
     this.executing = 1; /* mutual exclusive lock */
-    var sqlStatement = this.pending[0]; 
+    var sqlStatement = this.pending[0];
     var self=this;
     this.db.transaction(function (tx) {
       tx.executeSql(sqlStatement, [],
@@ -119,11 +117,11 @@ LocalStoragePlus.prototype.dbTrans = function() {
         console.log("LocalStoragePlus: Successfully saved "+self.pending[0].key+" to DB");
         self.pending.splice(0, 1); /* remove from pending queue array */
         self.executing=0;
-        
+
         if (self.pending.length>0) { /* any more waiting? */
           self.dbTrans();
         }
-        
+
       }, function (err) {
         /*** ERROR ***/
         console.log(err.message);
@@ -145,13 +143,8 @@ LocalStoragePlus.prototype.migrateLocalStorage = function() {
     if (this.getItem(key) == null) { /* dont overwrite it if it exists already */
       this.setItem(key, value);
     }
-    
   }
-
 }
 
 
 var localStoragePlus = new LocalStoragePlus();
-
-
-

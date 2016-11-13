@@ -1,6 +1,6 @@
 # localStoragePlus
 Replacement for the browsers localStorage functions, specifically for use with Cordova,
-where localStorage can be wiped when a phone is low on storage.
+where localStorage can be wiped when a phone's storage is low.
 
 localStorage is a quick and easy way to store some simple strings in a Cordova app that you need
 to persist if the app is closed.  Examples are app settings, cached data, users ids, etc.  But
